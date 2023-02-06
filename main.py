@@ -1,3 +1,4 @@
+import random
 import pygame
 
 pygame.init()
@@ -40,6 +41,7 @@ fade_alpha = 255
 
 music = pygame.mixer.Sound("assets/music.ogg")
 music.play(-1)
+hit = pygame.mixer.Sound("assets/pong.wav")
 
 cena = "menu"
 
@@ -67,9 +69,11 @@ while loop:
             cena = "gameover"
             fade_alpha = 255
 
-        if ball.colliderect(player1) or ball.colliderect(player2):
-            ball_dir_x *= -1
-            hit = pygame.mixer.Sound("assets/pong.wav")
+        if ball.colliderect(player1) and ball.x > player1.x + 55:
+            ball_dir_x = random.randint(6,8)
+            hit.play()
+        elif ball.colliderect(player2) and ball.x < player2.x:
+            ball_dir_x = random.randint(-8,-6)
             hit.play()
         
         if player1.y <= 0:
@@ -92,18 +96,19 @@ while loop:
             ball_dir_x *= -1
 
         if ball.y <= 0:
-            hit = pygame.mixer.Sound("assets/pong.wav")
             hit.play()
-            ball_dir_y *= -1
+            ball_dir_y = random.randint(4,8)
         elif ball.y >= 720 - 15:
-            hit = pygame.mixer.Sound("assets/pong.wav")
             hit.play()
-            ball_dir_y *= -1
+            ball_dir_y = random.randint(-8,-4)
 
         ball.x += ball_dir_x 
         ball.y += ball_dir_y 
 
-        player2.y = ball.y - 75
+        if ball.y > player2.y + 75:
+            player2.y += 2
+        elif ball.y < player2.y + 75:
+            player2.y -= 2
 
         if player2.y <= 0:
             player2.y = 0
@@ -131,6 +136,8 @@ while loop:
                 if event.key == pygame.K_RETURN:
                     cena = "menu"
                     fade_alpha = 255
+                if event.key == pygame.K_q:
+                    loop = False
 
         if fade_alpha > 0:
             fade_alpha -= 10
@@ -159,6 +166,8 @@ while loop:
 
                     start = pygame.mixer.Sound("assets/start.wav")
                     start.play()
+                if event.key == pygame.K_q:
+                    loop = False
 
         if fade_alpha > 0:
             fade_alpha -= 10
